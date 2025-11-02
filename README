@@ -1,13 +1,136 @@
-1. Type "make" to build.  (Type "make clean" first if you already compiled and want to recompile from scratch.)
+# Branch Prediction Simulator
 
-2. Run trace reader:
+A **C++ implementation** of **bimodal**, **gshare**, and **hybrid** branch predictors — developed for **ECE 563: Computer Architecture (Fall 2025, NC State University)** under Prof. Eric Rotenberg.  
+The simulator models classic branch prediction architectures and reports detailed performance statistics following the official project specification.
 
-   To run without throttling output:
-   ./sim bimodal 6 gcc_trace.txt
-   ./sim gshare 9 3 gcc_trace.txt
-   ./sim hybrid 8 14 10 5 gcc_trace.txt
+---
 
-   To run with throttling (via "less"):
-   ./sim bimodal 6 gcc_trace.txt | less
-   ./sim gshare 9 3 gcc_trace.txt | less
-   ./sim hybrid 8 14 10 5 gcc_trace.txt | less
+## Overview
+
+This project simulates three types of branch predictors:
+
+| Predictor  | Description |
+|------------|--------------|
+| **Bimodal**| Uses only PC bits to index a table of 2-bit saturating counters. |
+| **Gshare** | Combines global branch history with PC bits via XOR to improve correlation. |
+| **Hybrid** | Dynamically chooses between bimodal and gshare predictors using a chooser table. |
+
+Each predictor maintains its own table of saturating counters initialized to **“weakly taken” (2)**.  
+The hybrid predictor’s chooser table starts with counters initialized to **1 (weakly prefer bimodal)**.
+
+---
+
+## Build Instructions
+
+Compile using the provided `Makefile`:
+
+```bash
+make
+```
+
+If you have previously compiled and want to rebuild from scratch:
+
+```bash
+make clean
+make
+```
+
+---
+
+## Running the Simulator
+
+The simulator accepts the following command-line formats:
+
+| Predictor   | Command |
+|------------ |----------|
+| **Bimodal** | `./sim bimodal <M2> <tracefile>` |
+| **Gshare**  | `./sim gshare <M1> <N> <tracefile>` |
+| **Hybrid**  | `./sim hybrid <K> <M1> <N> <M2> <tracefile>` |
+
+### Example Commands
+
+Run without throttling output:
+
+```bash
+./sim bimodal 6 gcc_trace.txt
+./sim gshare 9 3 gcc_trace.txt
+./sim hybrid 8 14 10 5 gcc_trace.txt
+```
+
+Run with output throttling (via `less`):
+
+```bash
+./sim bimodal 6 gcc_trace.txt | less
+./sim gshare 9 3 gcc_trace.txt | less
+./sim hybrid 8 14 10 5 gcc_trace.txt | less
+```
+
+---
+
+## Output Format
+
+Each run prints:
+
+```
+COMMAND
+ sim <type> [params] <tracefile>
+
+OUTPUT
+ number of predictions:    X
+ number of mispredictions: Y
+ misprediction rate:       Z.ZZ%
+
+FINAL [PREDICTOR] CONTENTS
+ <index> <counter_value>
+ ...
+```
+
+---
+
+## Project Structure
+
+```
+Branch_Prediction_Simulator/
+├── sim_bp.cc          # Main simulator implementation
+├── sim_bp.h           # Predictor class definitions
+├── Makefile           # Build script for Gradescope autograder
+├── proj2-v1.0.pdf     # Official project specification
+├── proj2-traces/      # Provided trace files
+├── proj2-validation/  # Validation outputs for self-grading
+├── proj2-debug/       # Optional debug traces and logs
+└── README.md          # Project documentation
+```
+
+---
+
+## Key Features
+
+- Object-oriented C++ design (separate `BIMODAL` and `GSHARE` classes)
+- Accurate **2-bit saturating counter** and **global history register** handling
+- Hybrid chooser logic with saturation between `[0, 3]`
+
+---
+
+## Course Info
+
+**Course:** ECE 563 – Computer Architecture (Graduate Section)  
+**Instructor:** Prof. Eric Rotenberg  
+**Institution:** North Carolina State University  
+**Semester:** Fall 2025  
+
+---
+
+## License
+
+This project is for **academic use only** under the **NCSU ECE 563 Project 2 guidelines**.  
+Redistribution or reuse of this code in coursework or online submissions is **strictly prohibited** under the university’s academic integrity policy.
+
+
+---
+
+### Author
+ **Tember Wu**  
+ *North Carolina State University, Department of Electrical & Computer Engineering*  
+ *tember.shuweiwu@gmail.com*  
+
+---
