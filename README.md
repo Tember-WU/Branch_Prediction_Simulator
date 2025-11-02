@@ -1,6 +1,6 @@
 # Branch Prediction Simulator
 
-A **C++ implementation** of **bimodal**, **gshare**, and **hybrid** branch predictors — developed for **ECE 563: Computer Architecture (Fall 2025, NC State University)** under Prof. Eric Rotenberg.  
+A **C++ implementation** of **bimodal**, **gshare**, and **hybrid** branch predictors — developed for **ECE 563: Microprocessor Architecture (Fall 2025, NC State University)** under Prof. Eric Rotenberg.  
 The simulator models classic branch prediction architectures and reports detailed performance statistics following the official project specification.
 
 ---
@@ -113,7 +113,7 @@ Branch_Prediction_Simulator/
 
 ## Course Info
 
-**Course:** ECE 563 – Computer Architecture (Graduate Section)  
+**Course:** ECE 563 – Microprocessor Architecture (Graduate Section)  
 **Instructor:** Prof. Eric Rotenberg  
 **Institution:** North Carolina State University  
 **Semester:** Fall 2025  
