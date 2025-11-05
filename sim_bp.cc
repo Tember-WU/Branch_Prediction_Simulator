@@ -91,7 +91,7 @@ void BIMODAL::update_one_prediction(unsigned long int addr, bool predicted_outco
 GSHARE::GSHARE(unsigned long int m, unsigned long int n)
         : num_index_bits(m), num_GBH_bits(n)
 {
-    if(m != 0 && n != 0){
+    if(m != 0){     // n could equal to 0, as this gshare works the same with bimodal
         unsigned long int num_sets = 1 << m;
         counters.resize(num_sets);
         for(unsigned long int i=0; i<num_sets; i++){
@@ -106,10 +106,16 @@ GSHARE::GSHARE(unsigned long int m, unsigned long int n)
 }
 
 void GSHARE::read_branch(unsigned long int addr, char actual_outcome){
-    unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
-    unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
-    unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
-    unsigned long int index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    unsigned long int index;
+    if(num_GBH_bits == 0){      // this gshare predictor works the same with bimodal
+        index = (addr >> 2) & ((1 << num_index_bits) - 1);
+    }else if(num_GBH_bits > 0){
+        unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
+        unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
+        unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
+        index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    }
+
     prediction_outcome = make_prediction(index);
     if(actual_outcome == 't'){
         increment_counter(index);
@@ -122,6 +128,7 @@ void GSHARE::read_branch(unsigned long int addr, char actual_outcome){
             num_misprediction ++;
         }
     }
+
     Update_GBH(actual_outcome);
 }
 
@@ -149,6 +156,9 @@ void GSHARE::decrement_counter(unsigned long int index){
 }
 
 void GSHARE::Update_GBH(char actual_outcome){
+    if(num_GBH_bits <= 0){
+        return;
+    }
     if(actual_outcome == 't'){
         GBH = (GBH >> 1) + (1 << (num_GBH_bits-1));
     }else if(actual_outcome == 'n'){
@@ -163,10 +173,15 @@ void GSHARE::print_content(){
 }
 
 bool GSHARE::get_one_prediction(unsigned long int addr){
-    unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
-    unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
-    unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
-    unsigned long int index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    unsigned long int index;
+    if(num_GBH_bits == 0){      // this gshare predictor works the same with bimodal
+        index = (addr >> 2) & ((1 << num_index_bits) - 1);
+    }else if(num_GBH_bits > 0){
+        unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
+        unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
+        unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
+        index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    }
     if(counters[index] >= 2){
         return true;
     }else{
@@ -175,10 +190,15 @@ bool GSHARE::get_one_prediction(unsigned long int addr){
 }
 
 void GSHARE::update_one_prediction(unsigned long int addr, bool predicted_outcome, char actual_outcome){
-    unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
-    unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
-    unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
-    unsigned long int index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    unsigned long int index;
+    if(num_GBH_bits == 0){      // this gshare predictor works the same with bimodal
+        index = (addr >> 2) & ((1 << num_index_bits) - 1);
+    }else if(num_GBH_bits > 0){
+        unsigned long int uppermost_PC = (addr >> (num_index_bits - num_GBH_bits + 2)) & ((1 << num_GBH_bits) - 1);
+        unsigned long int n_bit_XOR = GBH ^ uppermost_PC;
+        unsigned long int lowermost_PC = (addr >> 2) & ((1 << (num_index_bits - num_GBH_bits)) - 1);
+        index = (n_bit_XOR << (num_index_bits - num_GBH_bits)) + lowermost_PC;
+    }
 
     if(actual_outcome == 't'){
         increment_counter(index);
